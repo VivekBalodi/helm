@@ -1,0 +1,66 @@
+---
+# Source: zuul-chart/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "zuul-api-gateway"
+  labels:
+    helm.sh/chart: zuul-chart-0.1.0
+    app.kubernetes.io/name: zuul-chart
+    app.kubernetes.io/instance: zull
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  selector:
+    app.kubernetes.io/name: zuul-chart
+    app.kubernetes.io/instance: zull
+  ports:
+    - protocol: TCP
+      port: 999
+      targetPort: 999
+      nodePort: 32470
+  type: NodePort
+---
+# Source: zuul-chart/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zull
+  labels:
+    app:
+    helm.sh/chart: zuul-chart-0.1.0
+    app.kubernetes.io/name: zuul-chart
+    app.kubernetes.io/instance: zull
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: zuul-chart
+      app.kubernetes.io/instance: zull
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: zuul-chart-0.1.0
+        app.kubernetes.io/name: zuul-chart
+        app.kubernetes.io/instance: zull
+        app.kubernetes.io/version: "1.16.0"
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      containers:
+      - name: zuul-api-gateway
+        image: deekshithsn/zuul
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 999
+    affinity:
+        podAffinity:
+          requredDuringSchedulingIgnoreDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - react-ui
+            topologykey: kubernetes.io/hostname

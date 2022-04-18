@@ -10,7 +10,7 @@ service:
   type: NodePort
   port: 8080
   name: ui
-  targetPort: 8080
+  targetport: 8080
 
 container:
   name: react-ui
